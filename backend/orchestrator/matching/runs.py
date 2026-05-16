@@ -8,7 +8,7 @@ from ..services.storage import repository
 from .scoring import score_match
 
 
-def create_match_run(startup_id, mentor_ids=None):
+def create_match_run(startup_id, mentor_ids=None, created_by=None):
     startup = repository.get_startup(startup_id)
     if not startup:
         raise ValueError("Startup not found")
@@ -18,15 +18,19 @@ def create_match_run(startup_id, mentor_ids=None):
         wanted = set(mentor_ids)
         mentors = [mentor for mentor in mentors if mentor["id"] in wanted]
 
-    match_run = repository.create_match_run(
-        {
-            "startup_id": startup_id,
-            "cohort_id": startup.get("cohort_id"),
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "status": "completed",
-            "relationship_scope": "mentor-startup",
-        }
-    )
+    match_run_payload = {
+        "startup_id": startup_id,
+        "cohort_id": startup.get("cohort_id"),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "status": "completed",
+        "relationship_scope": "mentor-startup",
+    }
+    if created_by:
+        match_run_payload["created_by_user_id"] = created_by.id
+        match_run_payload["created_by_username"] = created_by.username
+        match_run_payload["updated_by_user_id"] = created_by.id
+
+    match_run = repository.create_match_run(match_run_payload)
 
     recommendations = []
     for mentor in mentors:

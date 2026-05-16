@@ -19,6 +19,10 @@ select {
   font: inherit;
 }
 
+button {
+  line-height: 1;
+}
+
 .appShell {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
@@ -26,6 +30,11 @@ select {
 }
 
 .sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
   background: #17352f;
   color: #f7fbf8;
   padding: 24px 18px;
@@ -103,7 +112,12 @@ select {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 14px;
   margin-bottom: 18px;
+}
+
+.topbar > div:first-child {
+  min-width: 0;
 }
 
 .topbar h2 {
@@ -122,11 +136,13 @@ select {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .iconButton {
   width: 40px;
   height: 40px;
+  flex: 0 0 40px;
   background: #ffffff;
   color: #17352f;
   border: 1px solid #dce6e1;
@@ -192,15 +208,24 @@ select {
   min-height: 112px;
   padding: 16px;
   display: grid;
-  align-content: space-between;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+  min-width: 0;
 }
 
 .metricCard span {
   color: #62746e;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .metricCard strong {
   font-size: 2rem;
+  line-height: 1;
+}
+
+.metricCard svg {
+  color: #1f7a5b;
 }
 
 .panel {
@@ -258,6 +283,7 @@ select {
 .fact {
   display: grid;
   gap: 5px;
+  min-width: 0;
 }
 
 .fact span,
@@ -266,6 +292,13 @@ select {
 .aiMode {
   color: #62746e;
   font-size: 0.82rem;
+}
+
+.fact strong,
+.panel h3,
+.topbar h2,
+.eyebrow {
+  overflow-wrap: anywhere;
 }
 
 .aiFooter {
@@ -387,17 +420,20 @@ select {
 .scoreRing strong,
 .scoreRing span {
   position: relative;
+  grid-area: 1 / 1;
 }
 
 .scoreRing strong {
   font-size: 1.25rem;
   line-height: 1;
+  transform: translateY(-6px);
 }
 
 .scoreRing span {
   font-size: 0.7rem;
   color: #62746e;
-  margin-top: 28px;
+  line-height: 1;
+  transform: translateY(12px);
 }
 
 .tagRow {
@@ -526,6 +562,123 @@ select {
   background: #fff2ef;
 }
 
+.notice {
+  margin-bottom: 14px;
+  color: #1f6d43;
+  background: #e9f7ed;
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.authShell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #eef4f1;
+}
+
+.authPanel {
+  width: min(480px, 100%);
+  padding: 24px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #dce6e1;
+}
+
+.authBrand {
+  color: #17201d;
+}
+
+.authTabs,
+.directoryTools,
+.topbarActions,
+.userPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbarActions {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+}
+
+.authTabs {
+  margin-bottom: 16px;
+}
+
+.authTabs button {
+  flex: 1;
+  border: 1px solid #dce6e1;
+  border-radius: 8px;
+  padding: 10px;
+  background: #f6faf8;
+  cursor: pointer;
+}
+
+.authTabs button.active {
+  background: #1f7a5b;
+  color: #ffffff;
+  border-color: #1f7a5b;
+}
+
+.authForm,
+.datasetForm {
+  display: grid;
+  gap: 12px;
+}
+
+.authForm label,
+.datasetForm label {
+  display: grid;
+  gap: 6px;
+  color: #53645f;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.authForm input,
+.datasetForm input {
+  min-height: 42px;
+  border: 1px solid #cfdcd7;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #17201d;
+}
+
+.datasetForm {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #edf2f0;
+  border-radius: 8px;
+  background: #f6faf8;
+}
+
+.userPill {
+  flex-shrink: 0;
+}
+
+.userPill > span,
+.userPill a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: #eef4f1;
+  color: #31544a;
+  text-decoration: none;
+  font-size: 0.86rem;
+  font-weight: 700;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 980px) {
   .appShell,
   .matchingLayout,
@@ -574,9 +727,26 @@ select {
 
   .recommendationTop,
   .cardFooter,
+  .topbar,
   .tableRow {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .directoryTools,
+  .topbarActions,
+  .userPill {
+    flex-wrap: wrap;
+  }
+
+  .topbarActions,
+  .userPill {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .userPill > span {
+    max-width: min(100%, 260px);
   }
 
   .barRow {

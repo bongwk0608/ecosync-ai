@@ -30,6 +30,16 @@ The default configuration uses in-memory seeded demo data. To use Firestore and 
 
 Set `REMEMBER_LLM_RESPONSES=1` to cache Gemini/fallback explanations per startup-mentor pair. Set it to `0` to call Gemini or fallback fresh for every recommendation.
 
+User access is protected by admin approval. Run migrations, create a superuser, then approve or decline registrations in Django Admin:
+
+```bash
+cd backend
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+Configure Gmail SMTP with a Gmail App Password if you want approval/decline emails to send from a real Gmail inbox. Without SMTP settings, local development uses console email output.
+
 ## Local Development
 
 Backend:
@@ -39,6 +49,7 @@ cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
+python manage.py migrate
 python manage.py runserver
 ```
 
@@ -52,6 +63,11 @@ npm run dev
 
 ## API Surface
 
+- `GET /api/health/`
+- `POST /api/auth/register/`
+- `POST /api/auth/login/`
+- `GET /api/auth/me/`
+- `POST /api/auth/logout/`
 - `GET /api/dashboard/`
 - `GET /api/evaluation/`
 - `GET /api/cohorts/`
@@ -59,13 +75,22 @@ npm run dev
 - `GET /api/partners/`
 - `GET /api/startups/`
 - `POST /api/startups/`
+- `GET /api/startups/{id}/`
+- `PATCH /api/startups/{id}/` staff only
+- `DELETE /api/startups/{id}/` staff only
 - `GET /api/mentors/`
 - `POST /api/mentors/`
+- `GET /api/mentors/{id}/`
+- `PATCH /api/mentors/{id}/` staff only
+- `DELETE /api/mentors/{id}/` staff only
 - `POST /api/match-runs/`
 - `GET /api/match-runs/{id}/`
 - `POST /api/recommendations/{id}/refresh-ai/`
 - `GET /api/relationships/`
 - `POST /api/relationships/`
+
+All ecosystem APIs require `Authorization: Token <token>` after login. New registrations remain inactive until an admin approves them in Django Admin.
+Approved users can add startup and mentor datasets. Only staff/admin users can update or delete those datasets.
 
 Recommendation responses include `ai_cache_status`:
 
@@ -95,13 +120,13 @@ docker compose up --build
 Cloud deployment path:
 
 1. Build backend and frontend containers.
-2. Deploy backend to Google Cloud Run with `GEMINI_API_KEY`, `GEMINI_MODEL`, `REMEMBER_LLM_RESPONSES`, Firestore credentials, allowed hosts, and CORS origins.
+2. Deploy backend to Google Cloud Run with `GEMINI_API_KEY`, `GEMINI_MODEL`, `REMEMBER_LLM_RESPONSES`, Gmail SMTP settings, Firestore credentials, allowed hosts, and CORS origins.
 3. Deploy frontend to Cloud Run, Firebase Hosting, or another static host with `VITE_API_URL` pointed at the backend.
 4. Set `USE_FIRESTORE=1` when Firestore persistence is ready; keep `USE_FIRESTORE=0` for deterministic judging demos.
 
 ## Prototype Notes
 
-- Authentication is intentionally deferred for demo speed.
+- Registration approval uses Django Admin, DRF token auth, and optional Gmail SMTP result emails.
 - Firestore is abstracted behind repository-style storage helpers.
 - Matching logic is split across `orchestrator.matching`.
 - AI prompting, validation, fallback, and evaluation are split across `orchestrator.ai`.

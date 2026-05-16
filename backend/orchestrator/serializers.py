@@ -1,6 +1,33 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 
 from .domain import RELATIONSHIP_STATUSES, RELATIONSHIP_TYPES
+from .models import UserProfile
+
+
+class RegisterSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    full_name = serializers.CharField(max_length=150)
+    organization = serializers.CharField(max_length=150)
+    role = serializers.ChoiceField(choices=[choice[0] for choice in UserProfile.ROLE_CHOICES])
+
+    def validate_username(self, value):
+        if get_user_model().objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username is already registered.")
+        return value
+
+    def validate_email(self, value):
+        if get_user_model().objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Email is already registered.")
+        return value
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
 
 class StartupSerializer(serializers.Serializer):

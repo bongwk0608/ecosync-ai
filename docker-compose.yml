@@ -18,6 +18,16 @@
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
       GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.1-flash-lite}"
       REMEMBER_LLM_RESPONSES: "${REMEMBER_LLM_RESPONSES:-1}"
+      ALLOW_PUBLIC_REGISTRATION: "${ALLOW_PUBLIC_REGISTRATION:-1}"
+      DEFAULT_REGISTERED_USER_GROUP: "${DEFAULT_REGISTERED_USER_GROUP:-program_manager}"
+      EMAIL_BACKEND: "${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}"
+      EMAIL_HOST: "${EMAIL_HOST:-smtp.gmail.com}"
+      EMAIL_PORT: "${EMAIL_PORT:-587}"
+      EMAIL_USE_TLS: "${EMAIL_USE_TLS:-1}"
+      EMAIL_ALLOW_INSECURE_TLS: "${EMAIL_ALLOW_INSECURE_TLS:-0}"
+      EMAIL_HOST_USER: "${EMAIL_HOST_USER:-}"
+      EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD:-}"
+      DEFAULT_FROM_EMAIL: "${DEFAULT_FROM_EMAIL:-EcoSync AI <noreply@ecosync.local>}"
     volumes:
       - ./backend:/app
       - ./:/workspace:ro

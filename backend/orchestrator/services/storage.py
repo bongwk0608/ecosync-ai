@@ -56,6 +56,13 @@ class DemoStore:
         existing["id"] = document_id
         return existing
 
+    def delete(self, collection, document_id):
+        before = len(self._data[collection])
+        self._data[collection] = [
+            item for item in self._data[collection] if item.get("id") != document_id
+        ]
+        return len(self._data[collection]) != before
+
     def replace_many_for_match_run(self, match_run_id, recommendations):
         self._data["match_recommendations"] = [
             item
@@ -123,6 +130,10 @@ class FirestoreStore:
         item.setdefault("created_at", datetime.now(timezone.utc).isoformat())
         self.db.collection(collection).document(document_id).set(item)
         return item
+
+    def delete(self, collection, document_id):
+        self.db.collection(collection).document(document_id).delete()
+        return True
 
     def replace_many_for_match_run(self, match_run_id, recommendations):
         batch = self.db.batch()
@@ -210,6 +221,13 @@ class FirestoreRestStore:
         )
         response.raise_for_status()
         return item
+
+    def delete(self, collection, document_id):
+        response = self.session.delete(self._document_url(collection, document_id))
+        if response.status_code == 404:
+            return False
+        response.raise_for_status()
+        return True
 
     def replace_many_for_match_run(self, match_run_id, recommendations):
         for item in self.recommendations_for_run(match_run_id):
@@ -312,6 +330,12 @@ class EcosystemRepository:
     def create_startup(self, payload):
         return self.store.create("startups", payload)
 
+    def update_startup(self, startup_id, payload):
+        return self.store.update("startups", startup_id, payload)
+
+    def delete_startup(self, startup_id):
+        return self.store.delete("startups", startup_id)
+
     def list_mentors(self):
         return self.store.list("mentors")
 
@@ -320,6 +344,12 @@ class EcosystemRepository:
 
     def create_mentor(self, payload):
         return self.store.create("mentors", payload)
+
+    def update_mentor(self, mentor_id, payload):
+        return self.store.update("mentors", mentor_id, payload)
+
+    def delete_mentor(self, mentor_id):
+        return self.store.delete("mentors", mentor_id)
 
     def create_match_run(self, payload):
         return self.store.create("match_runs", payload)

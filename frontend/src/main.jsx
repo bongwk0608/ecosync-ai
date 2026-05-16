@@ -6,11 +6,26 @@ import {
   Handshake,
   Network,
   RefreshCw,
+  LogOut,
   Sparkles,
   UserRoundCheck
 } from "lucide-react";
-import { createRelationship, getInitialData, refreshRecommendationAi, runMatch } from "./api/client.js";
+import {
+  createMentor,
+  createRelationship,
+  createStartup,
+  getCurrentUser,
+  getInitialData,
+  getStoredToken,
+  loginUser,
+  logoutUser,
+  refreshRecommendationAi,
+  registerUser,
+  runMatch,
+  setStoredToken
+} from "./api/client.js";
 import { NavButton } from "./components/ui.jsx";
+import { AuthView } from "./views/Auth.jsx";
 import { Dashboard } from "./views/Dashboard.jsx";
 import { Directory } from "./views/Directories.jsx";
 import { EvaluationView } from "./views/Evaluation.jsx";
@@ -33,11 +48,44 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [refreshingRecommendationIds, setRefreshingRecommendationIds] = useState([]);
+  const [user, setUser] = useState(null);
+  const [authChecking, setAuthChecking] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    loadInitialData();
+    bootstrapAuth();
   }, []);
+
+  async function bootstrapAuth() {
+    if (!getStoredToken()) {
+      setAuthChecking(false);
+      setLoading(false);
+      return;
+    }
+    try {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+      await loadInitialData();
+    } catch {
+      setStoredToken("");
+    } finally {
+      setAuthChecking(false);
+      setLoading(false);
+    }
+  }
+
+  async function handleLogin(payload) {
+    const response = await loginUser(payload);
+    setUser(response.user);
+    await loadInitialData();
+  }
+
+  async function handleLogout() {
+    await logoutUser();
+    setUser(null);
+    setMatchRun(null);
+    setRelationships([]);
+  }
 
   async function loadInitialData() {
     setLoading(true);
@@ -136,10 +184,37 @@ function App() {
     }
   }
 
+  async function addStartup(payload) {
+    try {
+      const created = await createStartup(payload);
+      setStartups((current) => [created, ...current]);
+      setSelectedStartupId((current) => current || created.id);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function addMentor(payload) {
+    try {
+      const created = await createMentor(payload);
+      setMentors((current) => [created, ...current]);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   const selectedStartup = useMemo(
     () => startups.find((startup) => startup.id === selectedStartupId),
     [startups, selectedStartupId]
   );
+
+  if (authChecking) {
+    return <div className="emptyState">Checking secure session...</div>;
+  }
+
+  if (!user) {
+    return <AuthView loginUser={handleLogin} registerUser={registerUser} />;
+  }
 
   return (
     <main className="appShell">
@@ -168,9 +243,18 @@ function App() {
             <p className="eyebrow">{cohorts[0]?.name || "Kuala Lumpur SME Growth Cohort"}</p>
             <h2>{viewTitle(activeView)}</h2>
           </div>
-          <button className="iconButton" onClick={loadInitialData} title="Refresh data">
-            <RefreshCw size={18} />
-          </button>
+          <div className="topbarActions">
+            <button className="iconButton" onClick={loadInitialData} title="Refresh data">
+              <RefreshCw size={18} />
+            </button>
+            <div className="userPill">
+              <span>{user.full_name || user.username}</span>
+              {user.is_staff && <a href="http://localhost:8000/admin/">Admin</a>}
+              <button className="iconButton" onClick={handleLogout} title="Logout">
+                <LogOut size={18} />
+              </button>
+            </div>
+          </div>
         </header>
 
         {error && <div className="alert">{error}</div>}
@@ -193,8 +277,8 @@ function App() {
                 refreshingRecommendationIds={refreshingRecommendationIds}
               />
             )}
-            {activeView === "startups" && <Directory title="Startup Profiles" items={startups} kind="startup" />}
-            {activeView === "mentors" && <Directory title="Mentor Directory" items={mentors} kind="mentor" />}
+            {activeView === "startups" && <Directory title="Startup Profiles" items={startups} kind="startup" onCreate={addStartup} canAdd />}
+            {activeView === "mentors" && <Directory title="Mentor Directory" items={mentors} kind="mentor" onCreate={addMentor} canAdd />}
             {activeView === "partners" && <Directory title="Partner Directory" items={partners} kind="partner" />}
             {activeView === "relationships" && <RelationshipBoard relationships={relationships} mentors={mentors} startups={startups} />}
             {activeView === "evaluation" && <EvaluationView evaluation={evaluation} />}
