@@ -76,5 +76,6 @@ REST_FRAMEWORK = {
 }
 
 USE_FIRESTORE = os.getenv("USE_FIRESTORE", "0") == "1"
+FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "ecosync-ai-ed846")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")

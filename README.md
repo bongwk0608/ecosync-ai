@@ -25,6 +25,20 @@ Open:
 
 The default configuration uses in-memory seeded demo data. To use Firestore and Gemini, copy `.env.example` to `.env`, fill the credentials, and set `USE_FIRESTORE=1`.
 
+Enabling Firestore (Docker)
+
+1. Copy `.env.example` to `.env` and fill `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY` (escape newlines as `\n`).
+2. Start with Docker Compose; the backend service will read these variables:
+
+```bash
+docker compose --env-file .env up --build
+```
+
+Notes:
+- The app reads `USE_FIRESTORE=1` to switch to Firestore. Without it, the demo in-memory store is used.
+- `FIREBASE_PRIVATE_KEY` in `.env` must contain `\n` for newline markers (the app replaces `\\n` with actual newlines at runtime).
+- Alternatively, mount a service account JSON into the container and adapt `orchestrator.services.storage` to load it via `credentials.Certificate("/path/to/json")`.
+
 ## Local Development
 
 Backend:
