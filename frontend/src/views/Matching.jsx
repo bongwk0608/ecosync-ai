@@ -3,7 +3,18 @@ import { Sparkles } from "lucide-react";
 import { RecommendationCard } from "../components/RecommendationCard.jsx";
 import { EmptyState, TagRow } from "../components/ui.jsx";
 
-export function MatchingWorkspace({ startups, selectedStartup, selectedStartupId, setSelectedStartupId, runMatching, running, matchRun, setRelationship }) {
+export function MatchingWorkspace({
+  startups,
+  selectedStartup,
+  selectedStartupId,
+  setSelectedStartupId,
+  runMatching,
+  running,
+  matchRun,
+  setRelationship,
+  refreshRecommendation,
+  refreshingRecommendationIds
+}) {
   return (
     <div className="matchingLayout">
       <section className="panel controlPanel">
@@ -40,6 +51,8 @@ export function MatchingWorkspace({ startups, selectedStartup, selectedStartupId
               recommendation={recommendation}
               rank={index + 1}
               setRelationship={setRelationship}
+              refreshRecommendation={refreshRecommendation}
+              refreshing={refreshingRecommendationIds.includes(recommendation.id)}
             />
           ))
         )}

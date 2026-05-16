@@ -17,6 +17,7 @@
       FIREBASE_PRIVATE_KEY: "${FIREBASE_PRIVATE_KEY:-}"
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
       GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.1-flash-lite}"
+      REMEMBER_LLM_RESPONSES: "${REMEMBER_LLM_RESPONSES:-1}"
     volumes:
       - ./backend:/app
       - ./:/workspace:ro

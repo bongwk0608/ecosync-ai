@@ -10,7 +10,7 @@ from .serializers import (
     StartupSerializer,
 )
 from .ai.evaluation import evaluate_matching
-from .matching import create_match_run, get_match_run
+from .matching import create_match_run, get_match_run, refresh_recommendation_ai
 from .services.dashboard import dashboard_summary
 from .services.storage import repository
 
@@ -88,6 +88,20 @@ class MatchRunDetailView(APIView):
         if not match_run:
             return Response({"detail": "Match run not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response(match_run)
+
+
+class RecommendationRefreshAiView(APIView):
+    def post(self, _request, recommendation_id):
+        try:
+            recommendation = refresh_recommendation_ai(recommendation_id)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_404_NOT_FOUND)
+        if not recommendation:
+            return Response(
+                {"detail": "Recommendation not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        return Response(recommendation)
 
 
 class RelationshipCreateView(APIView):

@@ -1,4 +1,4 @@
-from ..matching import create_match_run, get_match_run, score_match
+from ..matching import create_match_run, get_match_run, refresh_recommendation_ai, score_match
 from ..matching.scoring import availability_points, weighted_bool
 from ..matching.terms import lower_list, normalize_terms, ratio_overlap, terms_from_mentor, terms_from_startup
 
@@ -9,6 +9,7 @@ __all__ = [
     "lower_list",
     "normalize_terms",
     "ratio_overlap",
+    "refresh_recommendation_ai",
     "score_match",
     "terms_from_mentor",
     "terms_from_startup",

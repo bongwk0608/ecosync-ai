@@ -20,6 +20,7 @@ COLLECTIONS = {
     "match_runs": [],
     "match_recommendations": [],
     "relationships": [],
+    "llm_explanations": [],
 }
 
 
@@ -42,6 +43,18 @@ class DemoStore:
         item.setdefault("created_at", datetime.now(timezone.utc).isoformat())
         self._data[collection].append(item)
         return item
+
+    def update(self, collection, document_id, payload):
+        existing = self.get(collection, document_id)
+        if existing is None:
+            item = dict(payload)
+            item.setdefault("id", document_id)
+            item.setdefault("created_at", datetime.now(timezone.utc).isoformat())
+            self._data[collection].append(item)
+            return item
+        existing.update(payload)
+        existing["id"] = document_id
+        return existing
 
     def replace_many_for_match_run(self, match_run_id, recommendations):
         self._data["match_recommendations"] = [
@@ -99,6 +112,16 @@ class FirestoreStore:
         item.setdefault("id", f"{collection[:-1]}-{uuid.uuid4().hex[:8]}")
         item.setdefault("created_at", datetime.now(timezone.utc).isoformat())
         self.db.collection(collection).document(item["id"]).set(item)
+        return item
+
+    def update(self, collection, document_id, payload):
+        item = dict(payload)
+        item.setdefault("id", document_id)
+        existing = self.get(collection, document_id)
+        if existing and "created_at" not in item:
+            item["created_at"] = existing.get("created_at")
+        item.setdefault("created_at", datetime.now(timezone.utc).isoformat())
+        self.db.collection(collection).document(document_id).set(item)
         return item
 
     def replace_many_for_match_run(self, match_run_id, recommendations):
@@ -169,6 +192,20 @@ class FirestoreRestStore:
         item.setdefault("created_at", datetime.now(timezone.utc).isoformat())
         response = self.session.patch(
             self._document_url(collection, item["id"]),
+            json={"fields": self._encode_fields(item)},
+        )
+        response.raise_for_status()
+        return item
+
+    def update(self, collection, document_id, payload):
+        item = dict(payload)
+        item.setdefault("id", document_id)
+        existing = self.get(collection, document_id)
+        if existing and "created_at" not in item:
+            item["created_at"] = existing.get("created_at")
+        item.setdefault("created_at", datetime.now(timezone.utc).isoformat())
+        response = self.session.patch(
+            self._document_url(collection, document_id),
             json={"fields": self._encode_fields(item)},
         )
         response.raise_for_status()
@@ -293,11 +330,23 @@ class EcosystemRepository:
     def list_recommendations(self):
         return self.store.list("match_recommendations")
 
+    def get_recommendation(self, recommendation_id):
+        return self.store.get("match_recommendations", recommendation_id)
+
+    def update_recommendation(self, recommendation_id, payload):
+        return self.store.update("match_recommendations", recommendation_id, payload)
+
     def replace_recommendations_for_run(self, match_run_id, recommendations):
         return self.store.replace_many_for_match_run(match_run_id, recommendations)
 
     def recommendations_for_run(self, match_run_id):
         return self.store.recommendations_for_run(match_run_id)
+
+    def get_llm_explanation(self, cache_id):
+        return self.store.get("llm_explanations", cache_id)
+
+    def create_or_update_llm_explanation(self, cache_id, payload):
+        return self.store.update("llm_explanations", cache_id, payload)
 
     def list_relationships(self):
         return self.store.list("relationships")

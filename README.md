@@ -28,6 +28,8 @@ Open:
 
 The default configuration uses in-memory seeded demo data. To use Firestore and Gemini, copy `.env.example` to `.env`, fill the credentials, and set `USE_FIRESTORE=1`.
 
+Set `REMEMBER_LLM_RESPONSES=1` to cache Gemini/fallback explanations per startup-mentor pair. Set it to `0` to call Gemini or fallback fresh for every recommendation.
+
 ## Local Development
 
 Backend:
@@ -61,8 +63,16 @@ npm run dev
 - `POST /api/mentors/`
 - `POST /api/match-runs/`
 - `GET /api/match-runs/{id}/`
+- `POST /api/recommendations/{id}/refresh-ai/`
 - `GET /api/relationships/`
 - `POST /api/relationships/`
+
+Recommendation responses include `ai_cache_status`:
+
+- `hit`: reused a valid cached explanation.
+- `miss`: generated a new explanation because cache was empty or stale.
+- `refresh`: refreshed one recommendation card manually.
+- `disabled`: cache is off because `REMEMBER_LLM_RESPONSES=0`.
 
 ## Rubric Alignment
 
@@ -85,7 +95,7 @@ docker compose up --build
 Cloud deployment path:
 
 1. Build backend and frontend containers.
-2. Deploy backend to Google Cloud Run with `GEMINI_API_KEY`, `GEMINI_MODEL`, Firestore credentials, allowed hosts, and CORS origins.
+2. Deploy backend to Google Cloud Run with `GEMINI_API_KEY`, `GEMINI_MODEL`, `REMEMBER_LLM_RESPONSES`, Firestore credentials, allowed hosts, and CORS origins.
 3. Deploy frontend to Cloud Run, Firebase Hosting, or another static host with `VITE_API_URL` pointed at the backend.
 4. Set `USE_FIRESTORE=1` when Firestore persistence is ready; keep `USE_FIRESTORE=0` for deterministic judging demos.
 

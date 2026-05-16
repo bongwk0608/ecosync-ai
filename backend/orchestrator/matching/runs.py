@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from ..ai.gemini import explain_match
+from ..ai.cache import get_or_create_explanation
 from ..services.storage import repository
 from .scoring import score_match
 
@@ -31,28 +31,16 @@ def create_match_run(startup_id, mentor_ids=None):
     recommendations = []
     for mentor in mentors:
         deterministic = score_match(startup, mentor)
-        ai = explain_match(startup, mentor, deterministic)
+        ai_result = get_or_create_explanation(startup, mentor, deterministic)
         recommendations.append(
-            {
-                "id": f"recommendation-{uuid.uuid4().hex[:8]}",
-                "match_run_id": match_run["id"],
-                "startup_id": startup["id"],
-                "mentor_id": mentor["id"],
-                "mentor": mentor,
-                "total_score": deterministic["total_score"],
-                "score_breakdown": deterministic["score_breakdown"],
-                "matched_terms": deterministic["matched_terms"],
-                "support_gaps": deterministic["support_gaps"],
-                "risks": deterministic["risks"],
-                "relationship_type": ai["relationship_type"],
-                "confidence": ai["confidence"],
-                "recommended_next_action": ai["recommended_next_action"],
-                "outcome_metric": ai["outcome_metric"],
-                "ethical_consideration": ai["ethical_consideration"],
-                "ai": ai,
-                "status": "recommended",
-                "lifecycle_status": "recommended",
-            }
+            _recommendation_payload(
+                recommendation_id=f"recommendation-{uuid.uuid4().hex[:8]}",
+                match_run_id=match_run["id"],
+                startup=startup,
+                mentor=mentor,
+                deterministic=deterministic,
+                ai_result=ai_result,
+            )
         )
 
     recommendations.sort(key=lambda item: item["total_score"], reverse=True)
@@ -71,3 +59,67 @@ def get_match_run(match_run_id):
         reverse=True,
     )
     return match_run
+
+
+def refresh_recommendation_ai(recommendation_id):
+    recommendation = repository.get_recommendation(recommendation_id)
+    if not recommendation:
+        return None
+
+    startup = repository.get_startup(recommendation["startup_id"])
+    mentor = repository.get_mentor(recommendation["mentor_id"])
+    if not startup or not mentor:
+        raise ValueError("Recommendation startup or mentor not found")
+
+    deterministic = score_match(startup, mentor)
+    ai_result = get_or_create_explanation(
+        startup,
+        mentor,
+        deterministic,
+        force_refresh=True,
+    )
+    updated = {
+        **recommendation,
+        **_recommendation_payload(
+            recommendation_id=recommendation["id"],
+            match_run_id=recommendation["match_run_id"],
+            startup=startup,
+            mentor=mentor,
+            deterministic=deterministic,
+            ai_result=ai_result,
+        ),
+    }
+    return repository.update_recommendation(recommendation_id, updated)
+
+
+def _recommendation_payload(
+    recommendation_id,
+    match_run_id,
+    startup,
+    mentor,
+    deterministic,
+    ai_result,
+):
+    ai = ai_result["ai"]
+    return {
+        "id": recommendation_id,
+        "match_run_id": match_run_id,
+        "startup_id": startup["id"],
+        "mentor_id": mentor["id"],
+        "mentor": mentor,
+        "total_score": deterministic["total_score"],
+        "score_breakdown": deterministic["score_breakdown"],
+        "matched_terms": deterministic["matched_terms"],
+        "support_gaps": deterministic["support_gaps"],
+        "risks": deterministic["risks"],
+        "relationship_type": ai["relationship_type"],
+        "confidence": ai["confidence"],
+        "recommended_next_action": ai["recommended_next_action"],
+        "outcome_metric": ai["outcome_metric"],
+        "ethical_consideration": ai["ethical_consideration"],
+        "ai": ai,
+        "ai_cache_status": ai_result["ai_cache_status"],
+        "ai_cache_key": ai_result["ai_cache_key"],
+        "status": "recommended",
+        "lifecycle_status": "recommended",
+    }

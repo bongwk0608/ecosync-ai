@@ -38,3 +38,9 @@ export function createRelationship(payload) {
     body: JSON.stringify(payload)
   });
 }
+
+export function refreshRecommendationAi(recommendationId) {
+  return fetchJson(`/recommendations/${recommendationId}/refresh-ai/`, {
+    method: "POST"
+  });
+}

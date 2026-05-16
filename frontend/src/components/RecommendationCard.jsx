@@ -1,8 +1,8 @@
 import React from "react";
-import { Check, Clock3, X } from "lucide-react";
+import { Check, Clock3, RefreshCw, X } from "lucide-react";
 import { ScoreBreakdown, ScoreRing, TagRow } from "./ui.jsx";
 
-export function RecommendationCard({ recommendation, rank, setRelationship }) {
+export function RecommendationCard({ recommendation, rank, setRelationship, refreshRecommendation, refreshing }) {
   const mentor = recommendation.mentor;
   const ai = recommendation.ai || {};
   return (
@@ -25,7 +25,17 @@ export function RecommendationCard({ recommendation, rank, setRelationship }) {
       </div>
       {!!ai.risks?.length && <TagRow tags={ai.risks} />}
       <div className="cardFooter">
-        <span className="aiMode">{ai.ai_mode} | {ai.model}</span>
+        <div className="aiFooter">
+          <span className="aiMode">{ai.ai_mode} | {ai.model} | {cacheLabel(recommendation.ai_cache_status)}</span>
+          <button
+            className="refreshAiButton"
+            onClick={() => refreshRecommendation(recommendation.id)}
+            disabled={refreshing}
+            title="Refresh AI explanation"
+          >
+            <RefreshCw size={15} />
+          </button>
+        </div>
         <div className="actionGroup">
           <button className="ghostButton" onClick={() => setRelationship(recommendation, "needs_review")} title="Mark for review">
             <Clock3 size={16} /> Review
@@ -40,6 +50,15 @@ export function RecommendationCard({ recommendation, rank, setRelationship }) {
       </div>
     </article>
   );
+}
+
+function cacheLabel(status) {
+  return {
+    hit: "cache hit",
+    miss: "cache miss",
+    refresh: "refreshed",
+    disabled: "cache disabled"
+  }[status] || "cache pending";
 }
 
 function Insight({ title, value }) {

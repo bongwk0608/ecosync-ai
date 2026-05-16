@@ -83,3 +83,4 @@ REST_FRAMEWORK = {
 USE_FIRESTORE = os.getenv("USE_FIRESTORE", "0") == "1"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
+REMEMBER_LLM_RESPONSES = os.getenv("REMEMBER_LLM_RESPONSES", "1") == "1"

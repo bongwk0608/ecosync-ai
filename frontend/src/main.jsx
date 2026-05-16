@@ -9,7 +9,7 @@ import {
   Sparkles,
   UserRoundCheck
 } from "lucide-react";
-import { createRelationship, getInitialData, runMatch } from "./api/client.js";
+import { createRelationship, getInitialData, refreshRecommendationAi, runMatch } from "./api/client.js";
 import { NavButton } from "./components/ui.jsx";
 import { Dashboard } from "./views/Dashboard.jsx";
 import { Directory } from "./views/Directories.jsx";
@@ -32,6 +32,7 @@ function App() {
   const [activeView, setActiveView] = useState("dashboard");
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
+  const [refreshingRecommendationIds, setRefreshingRecommendationIds] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -115,6 +116,26 @@ function App() {
     }
   }
 
+  async function refreshRecommendation(recommendationId) {
+    setRefreshingRecommendationIds((current) => [...new Set([...current, recommendationId])]);
+    setError("");
+    try {
+      const updated = await refreshRecommendationAi(recommendationId);
+      setMatchRun((current) => current ? {
+        ...current,
+        recommendations: current.recommendations.map((recommendation) =>
+          recommendation.id === recommendationId ? updated : recommendation
+        )
+      } : current);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRefreshingRecommendationIds((current) =>
+        current.filter((id) => id !== recommendationId)
+      );
+    }
+  }
+
   const selectedStartup = useMemo(
     () => startups.find((startup) => startup.id === selectedStartupId),
     [startups, selectedStartupId]
@@ -168,6 +189,8 @@ function App() {
                 running={running}
                 matchRun={matchRun}
                 setRelationship={setRelationship}
+                refreshRecommendation={refreshRecommendation}
+                refreshingRecommendationIds={refreshingRecommendationIds}
               />
             )}
             {activeView === "startups" && <Directory title="Startup Profiles" items={startups} kind="startup" />}

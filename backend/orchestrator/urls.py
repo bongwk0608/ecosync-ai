@@ -13,5 +13,9 @@ urlpatterns = [
     path("mentors/", views.MentorListCreateView.as_view()),
     path("match-runs/", views.MatchRunCreateView.as_view()),
     path("match-runs/<str:match_run_id>/", views.MatchRunDetailView.as_view()),
+    path(
+        "recommendations/<str:recommendation_id>/refresh-ai/",
+        views.RecommendationRefreshAiView.as_view(),
+    ),
     path("relationships/", views.RelationshipCreateView.as_view()),
 ]
