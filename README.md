@@ -1,16 +1,19 @@
 # EcoSync AI
 
-AI-powered ecosystem relationship orchestration platform for scalable program and cohort management.
+AI-powered ecosystem linkage orchestration for scalable program and cohort management.
 
-EcoSync AI is a hackathon prototype for program managers who need to match SME startups with mentors across cohorts. It uses a React frontend, Django REST API, Firestore-ready storage, Gemini-ready AI explanations, and Docker deployment.
+EcoSync AI is a Build with AI MyHack prototype for program managers who need to form, approve, monitor, and reuse ecosystem relationships across cohorts. The official problem highlights that mentor, company, partner, and program linkages are often created manually as one-off assignments. EcoSync treats those relationships as first-class entities with AI recommendations, human approval, lifecycle status, and measurable next actions.
 
 ## What the Demo Shows
 
 - A Kuala Lumpur SME cohort with seeded startups and mentors.
-- Startup-to-mentor matching for food and beverage and small business domains.
+- Startup-to-mentor ecosystem matching for food and beverage and small business domains.
+- Partner and program data to show reusable ecosystem context beyond one cohort.
 - Deterministic analytics score breakdowns for domain fit, business challenge fit, stage, location, availability, and growth fit.
-- Gemini-compatible explanation generation with a local fallback when no API key is configured.
-- Relationship actions: approve, reject, or mark a recommendation for review.
+- Gemini-compatible explanation generation with model/fallback visibility.
+- Relationship actions: approve, reject, or mark a recommendation as needing review.
+- Relationship lifecycle tracking with next actions, risk notes, and outcome metrics.
+- Dashboard and evaluation screens for rubric evidence.
 
 ## Run with Docker
 
@@ -47,18 +50,51 @@ npm run dev
 
 ## API Surface
 
+- `GET /api/dashboard/`
+- `GET /api/evaluation/`
 - `GET /api/cohorts/`
+- `GET /api/programs/`
+- `GET /api/partners/`
 - `GET /api/startups/`
 - `POST /api/startups/`
 - `GET /api/mentors/`
 - `POST /api/mentors/`
 - `POST /api/match-runs/`
 - `GET /api/match-runs/{id}/`
+- `GET /api/relationships/`
 - `POST /api/relationships/`
+
+## Rubric Alignment
+
+- Google Technology Integration: Gemini explanations and Firestore-ready persistence, with a Google Cloud Run deployment path.
+- AI Implementation Quality: deterministic ranking plus Gemini JSON explanations, fallback validation, risks, gaps, confidence, and ethical guardrails.
+- Working Demo & UI/UX: dashboard, matching workspace, directories, relationship board, and evaluation view.
+- AI Model Performance: benchmark cases expose expected vs actual top mentor, top-1 accuracy, average confidence, and AI mode counts.
+- Problem-Solution Fit: replaces manual ecosystem coordination with reusable relationship records and human-approved recommendations.
+- Scalability: profile and relationship data can be reused across cohorts, programs, and regions.
+- Deployment Readiness: Docker Compose for local demo; Firestore/Gemini env vars for cloud-backed runs.
+
+## Deployment Readiness
+
+Local demo:
+
+```bash
+docker compose up --build
+```
+
+Cloud deployment path:
+
+1. Build backend and frontend containers.
+2. Deploy backend to Google Cloud Run with `GEMINI_API_KEY`, `GEMINI_MODEL`, Firestore credentials, allowed hosts, and CORS origins.
+3. Deploy frontend to Cloud Run, Firebase Hosting, or another static host with `VITE_API_URL` pointed at the backend.
+4. Set `USE_FIRESTORE=1` when Firestore persistence is ready; keep `USE_FIRESTORE=0` for deterministic judging demos.
 
 ## Prototype Notes
 
 - Authentication is intentionally deferred for demo speed.
-- Firestore is abstracted behind `orchestrator.services.storage`.
-- Matching logic is isolated in `orchestrator.services.matching`.
+- Firestore is abstracted behind repository-style storage helpers.
+- Matching logic is split across `orchestrator.matching`.
+- AI prompting, validation, fallback, and evaluation are split across `orchestrator.ai`.
 - Gemini output is validated and falls back to deterministic demo explanations when unavailable.
+
+See `SUBMISSION.md` for the short pitch, business model, SDG framing, and production next steps.

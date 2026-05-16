@@ -1,4 +1,4 @@
-services:
+﻿services:
   backend:
     build:
       context: ./backend
@@ -10,13 +10,16 @@ services:
       DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,backend"
       CORS_ALLOWED_ORIGINS: "http://localhost:5173,http://127.0.0.1:5173"
       USE_FIRESTORE: "${USE_FIRESTORE:-0}"
+      FIRESTORE_TRANSPORT: "${FIRESTORE_TRANSPORT:-rest}"
+      FIREBASE_CREDENTIALS_FILE: "${FIREBASE_CREDENTIALS_FILE_DOCKER:-/workspace/ecosync-ai-8cfbc-firebase-adminsdk-fbsvc-5bbaff829f.json}"
       FIREBASE_PROJECT_ID: "${FIREBASE_PROJECT_ID:-}"
       FIREBASE_CLIENT_EMAIL: "${FIREBASE_CLIENT_EMAIL:-}"
       FIREBASE_PRIVATE_KEY: "${FIREBASE_PRIVATE_KEY:-}"
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
-      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-1.5-flash}"
+      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.1-flash-lite}"
     volumes:
       - ./backend:/app
+      - ./:/workspace:ro
 
   frontend:
     build:

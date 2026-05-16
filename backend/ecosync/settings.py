@@ -1,7 +1,12 @@
-import os
+﻿import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR.parent / ".env", override=True)
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-ecosync-secret")
 DEBUG = os.getenv("DJANGO_DEBUG", "1") == "1"
@@ -77,4 +82,4 @@ REST_FRAMEWORK = {
 
 USE_FIRESTORE = os.getenv("USE_FIRESTORE", "0") == "1"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")

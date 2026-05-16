@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from .domain import RELATIONSHIP_STATUSES, RELATIONSHIP_TYPES
+
 
 class StartupSerializer(serializers.Serializer):
     id = serializers.CharField(required=False)
@@ -37,11 +39,15 @@ class MatchRunRequestSerializer(serializers.Serializer):
 
 
 class RelationshipSerializer(serializers.Serializer):
-    match_run_id = serializers.CharField()
+    match_run_id = serializers.CharField(required=False, allow_blank=True)
     startup_id = serializers.CharField()
     mentor_id = serializers.CharField()
-    relationship_type = serializers.ChoiceField(
-        choices=["primary mentor", "specialist mentor", "advisor", "not recommended"]
-    )
-    status = serializers.ChoiceField(choices=["approved", "rejected", "review"])
+    relationship_type = serializers.ChoiceField(choices=RELATIONSHIP_TYPES)
+    status = serializers.ChoiceField(choices=RELATIONSHIP_STATUSES)
     notes = serializers.CharField(required=False, allow_blank=True)
+    next_action = serializers.CharField(required=False, allow_blank=True)
+    review_reason = serializers.CharField(required=False, allow_blank=True)
+    outcome_metric = serializers.CharField(required=False, allow_blank=True)
+    lifecycle_status = serializers.ChoiceField(
+        choices=RELATIONSHIP_STATUSES, required=False
+    )

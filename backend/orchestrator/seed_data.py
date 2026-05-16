@@ -9,6 +9,37 @@ COHORTS = [
     }
 ]
 
+PROGRAMS = [
+    {
+        "id": "program-ecosync-accelerator",
+        "name": "EcoSync AI Accelerator",
+        "owner": "Cradle-style ecosystem program office",
+        "regions": ["Malaysia", "Singapore", "Indonesia"],
+        "relationship_goals": [
+            "mentor matching",
+            "partner referrals",
+            "follow-up accountability",
+        ],
+    }
+]
+
+PARTNERS = [
+    {
+        "id": "partner-cradle-grants",
+        "name": "Cradle Grant Readiness Desk",
+        "type": "funding partner",
+        "location": "Kuala Lumpur",
+        "capabilities": ["grant readiness", "market access", "founder coaching"],
+    },
+    {
+        "id": "partner-halal-advisory",
+        "name": "Halal Market Access Network",
+        "type": "compliance partner",
+        "location": "Kuala Lumpur",
+        "capabilities": ["halal certification", "retail introductions", "audit preparation"],
+    },
+]
+
 STARTUPS = [
     {
         "id": "startup-nasi-next",

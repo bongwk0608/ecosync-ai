@@ -3,6 +3,8 @@
 import os
 import sys
 
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+
 
 def main():
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ecosync.settings")

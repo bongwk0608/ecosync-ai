@@ -243,6 +243,11 @@ select {
   color: #7a5600;
 }
 
+.statusBadge.needs_review {
+  background: #fff1c7;
+  color: #7a5600;
+}
+
 .twoColumn,
 .splitPanels {
   display: grid;
@@ -387,6 +392,33 @@ select {
   font-weight: 700;
 }
 
+.insightGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.insight {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f6faf8;
+}
+
+.insight span,
+.tableRow small {
+  color: #62746e;
+  font-size: 0.78rem;
+}
+
+.insight strong {
+  color: #243530;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
 .breakdown {
   display: grid;
   gap: 9px;
@@ -483,7 +515,7 @@ select {
   }
 
   .navList {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 
   .navButton {
@@ -500,6 +532,10 @@ select {
 
   .controlPanel {
     position: static;
+  }
+
+  .insightGrid {
+    grid-template-columns: 1fr;
   }
 }
 

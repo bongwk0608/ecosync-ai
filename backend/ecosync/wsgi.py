@@ -2,6 +2,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ecosync.settings")
 
 application = get_wsgi_application()
