@@ -191,18 +191,17 @@ Production path:
 
 ## Demo Script
 
-Suggested 3-minute flow:
+Use [PITCH_VIDEO.md](PITCH_VIDEO.md) as the source of truth for the preliminary 3-minute recording. The video should be a continuous app demo:
 
-1. Login as an approved program manager.
-2. Open dashboard and show ecosystem counts, recommendations, and evaluation panel.
-3. Open Matching and select a startup.
-4. Generate relationships.
-5. Explain score breakdown, Gemini rationale, risks, support gaps, next action, and outcome metric.
-6. Refresh one AI explanation to show per-card AI control.
-7. Approve one recommendation and mark another for review.
-8. Open Relationship Board to show lifecycle tracking.
-9. Mention Django Admin approval and Gmail account-status notifications.
-10. Close with scalability: same relationship model can support mentors, partners, funders, alumni, and future cohorts.
+1. Open Dashboard and show ecosystem counts, recommendations, and relationship metrics.
+2. Open Matching and select `NasiNext Cloud Kitchen`.
+3. Generate relationships.
+4. Explain the score breakdown, Gemini-ready rationale, risks, support gaps, next action, ethical guardrail, and outcome metric.
+5. Refresh one AI explanation to show per-card AI control.
+6. Approve one recommendation and mark another for review.
+7. Open Relationship Board to show lifecycle tracking.
+8. Open Evaluation to show benchmark matching evidence.
+9. Close with scalability: the same relationship model can support mentors, partners, funders, alumni, and future cohorts.
 
 ## UN SDG Impact
 

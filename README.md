@@ -16,6 +16,8 @@ EcoSync AI is a Build with AI MyHack prototype for program managers who need to 
 - Registration, login, admin approval, role access, and optional Gmail status notifications.
 - Firestore-ready persistence with a demo fallback store for reliable local judging.
 
+For the preliminary 3-minute recording, use the timestamped run-of-show in [PITCH_VIDEO.md](PITCH_VIDEO.md).
+
 ## Tech Stack
 
 - Backend: Django 5, Django REST Framework, DRF token auth
