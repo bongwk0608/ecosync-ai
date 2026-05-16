@@ -1,25 +1,37 @@
-﻿services:
+services:
   backend:
     build:
       context: ./backend
     ports:
       - "8000:8000"
     environment:
+      # Django/API settings for local Docker. Override these from `.env` for deployment.
       DJANGO_DEBUG: "1"
       DJANGO_SECRET_KEY: "dev-ecosync-secret"
       DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,backend"
       CORS_ALLOWED_ORIGINS: "http://localhost:5173,http://127.0.0.1:5173"
+
+      # Storage. USE_FIRESTORE=0 uses in-memory seed data; USE_FIRESTORE=1 uses Firebase/Firestore.
       USE_FIRESTORE: "${USE_FIRESTORE:-0}"
       FIRESTORE_TRANSPORT: "${FIRESTORE_TRANSPORT:-rest}"
+
+      # Inside Docker, the repo root is mounted at /workspace.
+      # Set FIREBASE_CREDENTIALS_FILE_DOCKER in `.env` if your JSON filename differs.
       FIREBASE_CREDENTIALS_FILE: "${FIREBASE_CREDENTIALS_FILE_DOCKER:-/workspace/ecosync-ai-8cfbc-firebase-adminsdk-fbsvc-5bbaff829f.json}"
       FIREBASE_PROJECT_ID: "${FIREBASE_PROJECT_ID:-}"
       FIREBASE_CLIENT_EMAIL: "${FIREBASE_CLIENT_EMAIL:-}"
       FIREBASE_PRIVATE_KEY: "${FIREBASE_PRIVATE_KEY:-}"
+
+      # Gemini AI and response-memory cache.
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
       GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.1-flash-lite}"
       REMEMBER_LLM_RESPONSES: "${REMEMBER_LLM_RESPONSES:-1}"
+
+      # Registration and approval flow.
       ALLOW_PUBLIC_REGISTRATION: "${ALLOW_PUBLIC_REGISTRATION:-1}"
       DEFAULT_REGISTERED_USER_GROUP: "${DEFAULT_REGISTERED_USER_GROUP:-program_manager}"
+
+      # Gmail SMTP. Use a Gmail App Password for EMAIL_HOST_PASSWORD.
       EMAIL_BACKEND: "${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}"
       EMAIL_HOST: "${EMAIL_HOST:-smtp.gmail.com}"
       EMAIL_PORT: "${EMAIL_PORT:-587}"
@@ -38,6 +50,7 @@
     ports:
       - "5173:5173"
     environment:
+      # Browser-facing API URL. Use a deployed backend URL in production.
       VITE_API_URL: "http://localhost:8000/api"
     volumes:
       - ./frontend:/app
