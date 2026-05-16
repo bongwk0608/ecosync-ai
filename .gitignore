@@ -127,6 +127,7 @@ dist
 
 # pnpm
 .pnpm-store
+.npm-cache/
 
 # yarn v3
 .pnp.*
@@ -141,3 +142,13 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+db.sqlite3
+
+# Django
+staticfiles/
